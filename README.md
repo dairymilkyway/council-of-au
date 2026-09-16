@@ -47,37 +47,78 @@ This means the same agent configs work on any project that has a well-written `A
 
 ## Installation
 
-### Option A: Global (available in every workspace)
+### Step 1 - Update the hook path for your machine
 
-Copy the agent JSON files to your global Kiro agents directory:
-
-```
-~/.kiro/agents/
-```
-
-Copy the hooks to your workspace's `.kiro/hooks/` directory:
+Every agent JSON references hooks using an absolute path hardcoded to the original machine:
 
 ```
-.kiro/hooks/
+C:\Users\Gwyn\.kiro\hooks\session-init.ps1
 ```
 
-Copy the steering files to your workspace's `.kiro/steering/` directory:
+Before copying the agents, find-and-replace that path with your own username:
 
+**Windows (PowerShell):**
+```powershell
+$myHookPath = "$env:USERPROFILE\.kiro\hooks"
+Get-ChildItem "council-of-au\agents\*.json" | ForEach-Object {
+  (Get-Content $_.FullName -Raw) `
+    -replace [regex]::Escape('C:\\Users\\Gwyn\\.kiro\\hooks\\'), `
+             ($myHookPath.Replace('\','\\') + '\\') `
+  | Set-Content $_.FullName -NoNewline
+}
 ```
-.kiro/steering/
+
+**Mac/Linux (bash):**
+```bash
+HOOK_PATH="$HOME/.kiro/hooks"
+for f in council-of-au/agents/*.json; do
+  sed -i "s|/Users/Gwyn/.kiro/hooks/|$HOOK_PATH/|g" "$f"
+done
 ```
 
-### Option B: Workspace-local
+### Step 2 - Copy everything to global
 
-Copy everything into `.kiro/` in your project. Use the `install/` scripts if present.
+```powershell
+# Agents
+Copy-Item "council-of-au\agents\*.json" "$env:USERPROFILE\.kiro\agents\" -Force
 
-### After installing
+# Skills
+Copy-Item "council-of-au\skills\*" "$env:USERPROFILE\.kiro\skills\" -Recurse -Force
 
-1. Write `AGENTS.md` at your project root. See `install/AGENTS.md.template` for the required sections.
-2. Write `frontend/AGENTS.md` if you have a frontend layer.
-3. Write `backend/AGENTS.md` if you have a backend layer.
-4. Open the project in Kiro. The `dev` agent appears as an option.
-5. Say "use the council" to trigger the full chain.
+# Steering
+Copy-Item "council-of-au\steering\*" "$env:USERPROFILE\.kiro\steering\" -Force
+
+# Hooks
+New-Item -Path "$env:USERPROFILE\.kiro\hooks" -ItemType Directory -Force | Out-Null
+Copy-Item "council-of-au\hooks\*" "$env:USERPROFILE\.kiro\hooks\" -Force
+```
+
+### Step 3 - Set up each project
+
+For each project that uses the council, add a `.kiro/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "powershell",
+      "args": ["-NoProfile", "-File", "C:\\Users\\YOU\\.kiro\\hooks\\mcp-memory.ps1"],
+      "env": { "MEMORY_FILE_PATH": "C:\\path\\to\\your\\project\\.kiro\\memory.jsonl" }
+    },
+    "postgres": {
+      "command": "powershell",
+      "args": ["-NoProfile", "-File", "C:\\Users\\YOU\\.kiro\\hooks\\mcp-postgres.ps1",
+               "postgresql://user:pass@localhost:5432/your_db"]
+    }
+  }
+}
+```
+
+Then write `AGENTS.md` at your project root. See `install/AGENTS.md.template` for required sections.
+
+### Option B: Workspace-local (no global install)
+
+Copy everything into `.kiro/` in your project directly. Hook paths stay as `.kiro/hooks/` relative paths - no username substitution needed.
 
 ## Project configuration
 
