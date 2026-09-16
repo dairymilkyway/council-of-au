@@ -1,0 +1,61 @@
+---
+title: NPM
+description: How to publish your components to NPM.
+type: guide
+summary: Publishing component libraries to npm with versioned distribution, Tailwind configuration, TypeScript support, and package.json setup.
+prerequisites:
+  - /registry
+related:
+  - /marketplaces
+  - /docs
+---
+
+## Package Model
+
+npm packages distribute pre-built, versioned code as dependencies:
+
+```bash
+npm install @acme/ui-components
+```
+
+### Advantages
+
+- **Version Management** - Centralized versioning, users lock to specific versions
+- **Simplified Installation** - Single command adds entire library
+- **Dependency Resolution** - Automatic transitive dependency handling
+- **TypeScript Support** - Pre-built type definitions
+
+### Limitations
+
+- No direct source code access for modification
+- Customization limited to exposed API
+- Potential bundle size issues
+
+## Tailwind Configuration
+
+Users need to tell Tailwind to scan your package:
+
+```css
+@import "tailwindcss";
+@source "../node_modules/@acme/ui-components";
+```
+
+## Package.json Setup
+
+```json
+{
+  "name": "@acme/ui-components",
+  "version": "1.0.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}
+```

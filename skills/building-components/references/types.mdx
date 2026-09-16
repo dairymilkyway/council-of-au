@@ -1,0 +1,86 @@
+---
+title: Types
+description: Extending the browser's native HTML elements for maximum customization.
+type: reference
+summary: Patterns for extending native HTML attributes, single-element wrapping, exporting prop types, and avoiding prop name conflicts.
+prerequisites:
+  - /composition
+related:
+  - /as-child
+  - /polymorphism
+  - /state
+---
+
+## Single Element Wrapping
+
+Each exported component should wrap a single HTML or JSX element. This allows maximum customization without prop drilling.
+
+## Extending HTML Attributes
+
+Every component should extend the native HTML attributes of its wrapped element:
+
+```tsx
+export type CardRootProps = React.ComponentProps<"div"> & {
+  variant?: "default" | "outlined";
+};
+
+export const CardRoot = ({ variant = "default", ...props }: CardRootProps) => (
+  <div {...props} />
+);
+```
+
+### Common HTML Attribute Types
+
+```tsx
+type DivProps = React.ComponentProps<"div">;
+type ButtonProps = React.ComponentProps<"button">;
+type InputProps = React.ComponentProps<"input">;
+type FormProps = React.ComponentProps<"form">;
+type LinkProps = React.ComponentProps<"a">;
+```
+
+## Exporting Types
+
+Always export your component prop types as `<ComponentName>Props`:
+
+```tsx
+import type { ComponentProps } from "react";
+
+export type ShareButtonProps = ComponentProps<"button">;
+export const ShareButton = (props: ShareButtonProps) => <button {...props} />;
+```
+
+## Best Practices
+
+### 1. Always Spread Props Last
+
+```tsx
+// Good - user props override defaults
+<div className="default-class" {...props} />
+
+// Bad - defaults override user props
+<div {...props} className="default-class" />
+```
+
+### 2. Avoid Prop Name Conflicts
+
+```tsx
+// Bad - conflicts with HTML title attribute
+export type CardProps = React.ComponentProps<"div"> & { title: string };
+
+// Good - use a different name
+export type CardProps = React.ComponentProps<"div"> & { heading: string };
+```
+
+### 3. Document Custom Props
+
+```tsx
+export type DialogProps = React.ComponentProps<"div"> & {
+  /** Whether the dialog is currently open */
+  open: boolean;
+  /** Callback when the dialog requests to be closed */
+  onOpenChange: (open: boolean) => void;
+  /** Whether to render the dialog in a portal */
+  modal?: boolean;
+};
+```

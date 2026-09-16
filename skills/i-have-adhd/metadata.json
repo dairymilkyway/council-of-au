@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "organization": "Local Workspace Skill",
+  "date": "July 2026",
+  "abstract": "ADHD-friendly output discipline for all council agents. Shapes every response: lead with the next action, number multi-step work, restate progress every turn, suppress tangents, give specific time estimates, make wins visible, matter-of-fact errors. Always-on — no invocation needed.",
+  "references": [
+    "https://github.com/ayghri/i-have-adhd"
+  ]
+}

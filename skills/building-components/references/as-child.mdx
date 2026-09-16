@@ -1,0 +1,60 @@
+---
+title: asChild
+description: How to use the asChild prop to render a custom element within the component.
+type: reference
+summary: Using the asChild prop to replace default markup with custom elements while preserving component functionality and event handlers.
+prerequisites:
+  - /composition
+  - /types
+related:
+  - /polymorphism
+  - /state
+---
+
+The `asChild` prop allows you to replace default markup with custom elements while maintaining the component's functionality.
+
+## How It Works
+
+```tsx
+// Without asChild - nested elements
+<Dialog.Trigger>
+  <button>Open Dialog</button>
+</Dialog.Trigger>
+// Renders: <button data-state="closed"><button>Open Dialog</button></button>
+
+// With asChild - single merged element
+<Dialog.Trigger asChild>
+  <button>Open Dialog</button>
+</Dialog.Trigger>
+// Renders: <button data-state="closed">Open Dialog</button>
+```
+
+## Key Benefits
+
+1. **Semantic HTML** - Use the most appropriate element for your use case
+2. **Clean DOM** - Eliminates wrapper hell
+3. **Design System Integration** - Works seamlessly with existing components
+4. **Component Composition** - Compose multiple behaviors onto a single element
+
+## Common Use Cases
+
+```tsx
+// Custom link trigger
+<AlertDialog.Trigger asChild>
+  <a href="/delete">Delete Account</a>
+</AlertDialog.Trigger>
+
+// Design system button
+<DropdownMenu.Trigger asChild>
+  <Button variant="outline" size="icon">
+    <MoreVertical className="h-4 w-4" />
+  </Button>
+</DropdownMenu.Trigger>
+```
+
+## Best Practices
+
+- Maintain accessibility when changing element types
+- Always spread props in child components
+- Only pass a single child element (no fragments or multiple children)
+- Document when components support `asChild`

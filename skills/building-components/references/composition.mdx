@@ -1,0 +1,92 @@
+---
+title: Composition
+description: The foundation of building modern UI components.
+type: conceptual
+summary: How to break monolithic components into smaller, focused subcomponents using the compound component pattern and naming conventions.
+prerequisites:
+  - /definitions
+related:
+  - /types
+  - /state
+  - /as-child
+  - /polymorphism
+---
+
+Composition is the foundation of building modern UI components. Instead of cramming all functionality into a single component with dozens of props, composition distributes responsibility across multiple cooperating components.
+
+## Making a component composable
+
+Break down into smaller, more focused components:
+
+### 1. Root Component (manages state via context)
+
+```tsx
+const AccordionContext = createContext<AccordionProps>({ open: false, setOpen: () => {} });
+
+export type AccordionRootProps = React.ComponentProps<"div"> & {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+};
+
+export const Root = ({ children, open, setOpen, ...props }: AccordionRootProps) => (
+  <AccordionContext.Provider value={{ open, setOpen }}>
+    <div {...props}>{children}</div>
+  </AccordionContext.Provider>
+);
+```
+
+### 2. Item Component (wrapper)
+
+```tsx
+export type AccordionItemProps = React.ComponentProps<"div">;
+export const Item = (props: AccordionItemProps) => <div {...props} />;
+```
+
+### 3. Trigger Component (interactive)
+
+```tsx
+export type AccordionTriggerProps = React.ComponentProps<"button">;
+
+export const Trigger = (props: AccordionTriggerProps) => (
+  <AccordionContext.Consumer>
+    {({ open, setOpen }) => (
+      <button onClick={() => setOpen(!open)} {...props} />
+    )}
+  </AccordionContext.Consumer>
+);
+```
+
+### 4. Content Component (conditional display)
+
+```tsx
+export type AccordionContentProps = React.ComponentProps<"div">;
+
+export const Content = (props: AccordionContentProps) => (
+  <AccordionContext.Consumer>
+    {({ open }) => open ? <div {...props} /> : null}
+  </AccordionContext.Consumer>
+);
+```
+
+### 5. Usage
+
+```tsx
+import * as Accordion from "@/components/ui/accordion";
+
+<Accordion.Root open={false} setOpen={() => {}}>
+  {data.map((item) => (
+    <Accordion.Item key={item.title}>
+      <Accordion.Trigger>{item.title}</Accordion.Trigger>
+      <Accordion.Content>{item.content}</Accordion.Content>
+    </Accordion.Item>
+  ))}
+</Accordion.Root>
+```
+
+## Naming Conventions
+
+- **Root** - Main container, manages shared state and context
+- **Trigger** - Element that initiates an action
+- **Content** - Main content being shown/hidden
+- **Header / Body / Footer** - Structured content areas
+- **Title / Description** - Informational components

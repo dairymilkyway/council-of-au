@@ -1,0 +1,47 @@
+---
+title: Registry
+description: Understand the concept of component registries.
+type: conceptual
+summary: What component registries are, their source-code distribution model, and how to create one using the shadcn ecosystem.
+related:
+  - /npm
+  - /marketplaces
+  - /docs
+---
+
+Component registries distribute source code directly into projects, unlike npm packages that distribute compiled code.
+
+## What Makes a Registry?
+
+1. **Source Code Distribution** - Users get the full source, not a dependency
+2. **Metadata and Configuration** - Rich component metadata (dependencies, category, etc.)
+3. **Preview and Documentation** - Live previews and interactive examples
+
+## Registry vs NPM
+
+```tsx
+// Traditional npm package
+import { Button } from "some-ui-library";
+
+// Registry-based component (source in your project)
+import { Button } from "@/components/ui/button";
+```
+
+## Benefits
+
+- **For Authors**: Easy distribution, version control, community engagement
+- **For Consumers**: Discovery, preview before install, full code ownership
+
+## Creating a Registry
+
+Core elements needed:
+1. Components with source code
+2. A public endpoint serving component metadata
+3. CLI for installation (e.g., `npx shadcn@latest add`)
+
+## Using the shadcn Registry
+
+```bash
+# Install a component
+npx shadcn@latest add https://your-registry.vercel.app/metric-card.json
+```

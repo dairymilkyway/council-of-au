@@ -1,0 +1,102 @@
+---
+title: Styling
+description: Conditional and composable styling with Tailwind classes.
+type: guide
+summary: Using tailwind-merge, clsx, the cn utility, and Class Variance Authority for conditional and composable component styling.
+prerequisites:
+  - /composition
+related:
+  - /design-tokens
+  - /data-attributes
+---
+
+## The `cn` utility function
+
+```tsx
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+## Merging classes
+
+`tailwind-merge` resolves conflicts by keeping the last class:
+
+```tsx
+twMerge("px-4 py-2", "px-8"); // Returns: "py-2 px-8"
+twMerge("text-sm", "text-lg"); // Returns: "text-lg"
+```
+
+## Conditional classes with clsx
+
+```tsx
+clsx("base", isActive && "active");
+clsx("base", { active: isActive, disabled: isDisabled });
+```
+
+## Class Variance Authority (CVA)
+
+For complex components with many variants:
+
+```tsx
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-all",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-white hover:bg-destructive/90",
+        outline: "border bg-background hover:bg-accent",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3",
+        lg: "h-10 rounded-md px-6",
+        icon: "size-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+```
+
+## Best Practices
+
+### Order matters
+
+```tsx
+className={cn(
+  'base-styles',            // 1. Base
+  variant && variantStyles, // 2. Variants
+  isActive && 'active',     // 3. Conditionals
+  className                 // 4. User overrides (always last)
+)}
+```
+
+### Extract repeated patterns
+
+```tsx
+export const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
+export const disabled = 'disabled:pointer-events-none disabled:opacity-50';
+```
+
+### Define variants outside components
+
+CVA variants should be defined outside the component to avoid recreation on every render.
+
+### Use CSS variables for dynamic values
+
+```tsx
+// Good
+<div className="bg-[var(--color)]" style={{ '--color': dynamicColor } as React.CSSProperties} />
+
+// Avoid
+<div className={`bg-[${dynamicColor}]`} />
+```

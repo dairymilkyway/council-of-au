@@ -1,0 +1,93 @@
+---
+title: Definitions
+description: This page establishes precise terminology used throughout the specification. Terms are intentionally framework agnostic, but we will use React for examples.
+type: reference
+summary: Precise terminology for the specification covering primitives, components, patterns, blocks, pages, templates, and utilities.
+related:
+  - /principles
+  - /composition
+---
+
+## 1. Artifact Taxonomy
+
+### 1.1 Primitive
+
+A primitive (or, unstyled component) is the **lowest-level building block** that provides behavior and accessibility without any styling.
+
+Primitives are completely headless (i.e. unstyled) and encapsulate semantics, focus management, keyboard interaction, layering/portals, ARIA wiring, measurement, and similar concerns. They provide the behavioral foundation but require styling to become finished UI.
+
+Examples:
+
+- Radix UI Primitives (Dialog, Popover, Tooltip, etc.)
+- React Aria Components
+- Base UI
+- Headless UI
+
+Expectations:
+
+- Completely unstyled (headless).
+- Single responsibility; composable into styled components.
+- Ships with exhaustive a11y behavior for its role.
+- Versioning favors stability; breaking changes are rare and documented.
+
+### 1.2 Component
+
+A component is a styled, reusable UI unit that adds visual design to primitives or composes multiple elements to create complete, functional interface elements.
+
+Components are still relatively low-level but include styling, making them immediately usable in applications. They typically wrap unstyled primitives with default visual design while remaining customizable.
+
+Expectations:
+
+- Clear props API; supports controlled and uncontrolled usage where applicable.
+- Includes default styling but remains override-friendly (classes, tokens, slots).
+- Fully keyboard accessible and screen-reader friendly (inherits from primitives).
+- Composable (children/slots, render props, or compound subcomponents).
+- May be built from primitives or implement behavior directly with styling.
+
+### 1.3 Pattern
+
+Patterns are a specific composition of primitives or components that are used to solve a specific UI/UX problem.
+
+Examples: Form validation with inline errors, confirming destructive actions, typeahead search, optimistic UI.
+
+### 1.4 Block
+
+An opinionated, production-ready composition of components that solves a concrete interface use case (often product-specific) with content scaffolding. Blocks trade generality for speed of adoption.
+
+Examples: Pricing table, auth screens, onboarding stepper, AI chat panel, billing settings form.
+
+Expectations:
+
+- Strong defaults, copy-paste friendly, easily branded/themed.
+- Minimal logic beyond layout and orchestration; domain logic is stubbed via handlers.
+- Accepts data via props; never hides data behind fetches without a documented adapter.
+
+### 1.5 Page
+
+A complete, single-route view composed of multiple blocks arranged to serve a specific user-facing purpose.
+
+### 1.6 Template
+
+A multi-page collection or full-site scaffold that bundles pages, routing configuration, shared layouts, global providers, and project structure.
+
+### 1.7 Utility (Non-visual)
+
+A helper exported for developer ergonomics or composition; not rendered UI. Examples: React hooks, class utilities, keybinding helpers, focus scopes.
+
+## 2. API and Composition Vocabulary
+
+- **Props API**: The public configuration surface of a component.
+- **Children / Slots**: Placeholders for caller-provided structure or content.
+- **Render Prop**: A function child used to delegate rendering while the parent supplies state/data.
+- **Controlled vs. Uncontrolled**: Controlled components have their value driven by props; uncontrolled components hold internal state.
+- **Provider / Context**: A top-level component that supplies shared state/configuration to a subtree.
+- **Portal**: Rendering UI outside the DOM hierarchy to manage layering/stacking context.
+
+## 3. Classification Heuristics
+
+1. Does it encapsulate a single behavior or a11y concern, with no styling? -> **Primitive**
+2. Is it a styled, reusable UI element? -> **Component**
+3. Does it solve a concrete product use case with opinionated composition? -> **Block**
+4. Does it scaffold a page/flow with routing/providers? -> **Template**
+5. Is it documentation of a recurring solution? -> **Pattern**
+6. Is it non-visual logic? -> **Utility**

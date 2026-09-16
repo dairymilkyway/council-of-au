@@ -1,0 +1,78 @@
+---
+title: Data Attributes
+description: Using data attributes for declarative styling and component identification.
+type: reference
+summary: Using data-state for declarative visual state styling and data-slot for stable component identification in Tailwind-based systems.
+prerequisites:
+  - /composition
+  - /styling
+related:
+  - /design-tokens
+  - /accessibility
+---
+
+## Styling state with data-state
+
+Instead of exposing separate className props for different states, use `data-*` attributes:
+
+```tsx
+const Dialog = ({ className, ...props }: DialogProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div
+      data-state={isOpen ? "open" : "closed"}
+      className={cn("transition-all", className)}
+      {...props}
+    />
+  );
+};
+```
+
+Consumers style based on state:
+
+```tsx
+<Dialog className="data-[state=open]:opacity-100 data-[state=closed]:opacity-0" />
+```
+
+### Common state patterns
+
+```tsx
+<Accordion data-state={isOpen ? 'open' : 'closed'} />
+<Tab data-state={isSelected ? 'active' : 'inactive'} />
+<Button data-disabled={isDisabled} disabled={isDisabled} />
+<Button data-loading={isLoading} />
+<Slider data-orientation="horizontal" />
+```
+
+## Component identification with data-slot
+
+Use `data-slot` to give components stable identifiers that can be targeted by parents:
+
+```tsx
+function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
+  return (
+    <fieldset
+      data-slot="field-set"
+      className={cn(
+        "flex flex-col gap-6",
+        "has-[>[data-slot=checkbox-group]]:gap-3",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+```
+
+### Naming conventions for data-slot
+
+1. Use kebab-case: `data-slot="form-field"`
+2. Be specific: `data-slot="submit-button"` not `data-slot="button"`
+3. Match component purpose, not appearance
+4. Avoid implementation details
+
+## When to use what
+
+- **data-state** - Visual states (open/closed, active/inactive, loading)
+- **data-slot** - Component identification, parent-child targeting, global styling
+- **props** - Variants, sizes, behavioral configuration, event handlers

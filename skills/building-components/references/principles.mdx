@@ -1,0 +1,43 @@
+---
+title: Core Principles
+description: When building modern UI components, it's important to keep these core principles in mind.
+type: conceptual
+summary: The foundational values behind the specification including composability, accessibility, customizability, performance, and transparency.
+prerequisites:
+  - /definitions
+related:
+  - /composition
+  - /accessibility
+---
+
+## Composability and Reusability
+
+Favor composition over inheritance - build components that can be combined and nested to create more complex UIs, rather than relying on deep class hierarchies.
+
+Composable components expose a clear API (via props/slots) that allows developers to customize behavior and appearance by plugging in child elements or callbacks.
+
+## Accessible by Default
+
+Components must be usable by all users. Use semantic HTML elements appropriate to the component's role and augment with WAI-ARIA attributes when necessary.
+
+Ensure keyboard navigation and focus management are supported. Each component should adhere to accessibility standards out of the box.
+
+## Customizability and Theming
+
+A component should be easy to restyle or adapt to different design requirements. Avoid hard-coding visual styles that cannot be overridden.
+
+Provide mechanisms for theming and styling, such as CSS variables, clearly documented class names, or style props.
+
+## Lightweight and Performant
+
+Components should be as lean as possible in terms of assets and dependencies. Avoid bloating a component with large library dependencies or overly complex logic.
+
+Strive for good performance by minimizing unnecessary re-renders and using efficient algorithms for heavy tasks.
+
+## Transparency and Code Ownership
+
+Components should not be black boxes. When developers import or copy your component, they should be able to inspect how it works and modify it if needed.
+
+## Well-documented and DX-Friendly
+
+Document each component's purpose, props, and usage examples. Include notes on accessibility and customization options. Good documentation reduces misuse and lowers the barrier for adoption.

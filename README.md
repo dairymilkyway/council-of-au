@@ -78,19 +78,29 @@ done
 
 ### Step 2 - Copy everything to global
 
+**Windows (PowerShell) - run from inside the cloned repo directory:**
 ```powershell
 # Agents
-Copy-Item "council-of-au\agents\*.json" "$env:USERPROFILE\.kiro\agents\" -Force
+Copy-Item "agents\*.json" "$env:USERPROFILE\.kiro\agents\" -Force
 
-# Skills
-Copy-Item "council-of-au\skills\*" "$env:USERPROFILE\.kiro\skills\" -Recurse -Force
+# Skills (use robocopy to handle nested directories)
+robocopy "skills" "$env:USERPROFILE\.kiro\skills" /E /NP /NFL /NDL /NJH /NJS
 
 # Steering
-Copy-Item "council-of-au\steering\*" "$env:USERPROFILE\.kiro\steering\" -Force
+New-Item -Path "$env:USERPROFILE\.kiro\steering" -ItemType Directory -Force | Out-Null
+Copy-Item "steering\*" "$env:USERPROFILE\.kiro\steering\" -Force
 
 # Hooks
 New-Item -Path "$env:USERPROFILE\.kiro\hooks" -ItemType Directory -Force | Out-Null
-Copy-Item "council-of-au\hooks\*" "$env:USERPROFILE\.kiro\hooks\" -Force
+Copy-Item "hooks\*" "$env:USERPROFILE\.kiro\hooks\" -Force
+```
+
+**Mac/Linux (bash):**
+```bash
+cp agents/*.json ~/.kiro/agents/
+cp -r skills/* ~/.kiro/skills/
+cp steering/* ~/.kiro/steering/
+cp hooks/* ~/.kiro/hooks/
 ```
 
 ### Step 3 - Set up each project

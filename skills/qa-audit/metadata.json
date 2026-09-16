@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "organization": "Local Workspace Skill",
+  "date": "July 2026",
+  "abstract": "Senior-level QA audit skill for NestJS and Prisma backend applications. Covers correctness, architecture, performance, database efficiency, security, API design, authorization/RBAC, caching, scalability, maintainability, technical debt, and production readiness. Designed for AI agents performing structured code reviews and audits.",
+  "references": [
+    "https://docs.nestjs.com/",
+    "https://www.prisma.io/docs/",
+    "https://owasp.org/www-project-top-ten/"
+  ]
+}

@@ -1,0 +1,71 @@
+---
+title: State
+description: How to manage state in a component, as well as merging controllable and uncontrolled state.
+type: reference
+summary: Controlled vs uncontrolled state patterns and merging both modes with useControllableState from Radix UI.
+prerequisites:
+  - /composition
+  - /types
+related:
+  - /as-child
+---
+
+## Uncontrolled State
+
+Component manages its own state internally:
+
+```tsx
+export const Stepper = () => {
+  const [value, setValue] = useState(0);
+  return (
+    <div>
+      <p>{value}</p>
+      <button onClick={() => setValue(value + 1)}>Increment</button>
+    </div>
+  );
+};
+```
+
+## Controlled State
+
+State is managed by the parent component:
+
+```tsx
+type StepperProps = { value: number; setValue: (value: number) => void };
+
+export const Stepper = ({ value, setValue }: StepperProps) => (
+  <div>
+    <p>{value}</p>
+    <button onClick={() => setValue(value + 1)}>Increment</button>
+  </div>
+);
+```
+
+## Merging States
+
+The best components support both. Use `@radix-ui/react-use-controllable-state`:
+
+```tsx
+import { useControllableState } from "@radix-ui/react-use-controllable-state";
+
+type StepperProps = {
+  value: number;
+  defaultValue: number;
+  onValueChange: (value: number) => void;
+};
+
+export const Stepper = ({ value: controlledValue, defaultValue, onValueChange }: StepperProps) => {
+  const [value, setValue] = useControllableState({
+    prop: controlledValue,
+    defaultProp: defaultValue,
+    onChange: onValueChange,
+  });
+
+  return (
+    <div>
+      <p>{value}</p>
+      <button onClick={() => setValue(value + 1)}>Increment</button>
+    </div>
+  );
+};
+```

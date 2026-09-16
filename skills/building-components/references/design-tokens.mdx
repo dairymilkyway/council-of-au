@@ -1,0 +1,46 @@
+---
+title: Design Tokens
+description: How semantic naming conventions and design tokens create a flexible, maintainable theming system.
+type: conceptual
+summary: Semantic CSS variable architecture for theming with layers of abstraction that separate what something is from how it looks.
+prerequisites:
+  - /styling
+related:
+  - /data-attributes
+---
+
+Design tokens create layers of abstraction that separate what something is from how it looks.
+
+## Variable Architecture
+
+```css
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+}
+```
+
+Key tokens:
+
+- `--background` - Background colors (page background)
+- `--foreground` - General text color
+- `--primary` - Main brand color
+- `--primary-foreground` - Text color against primary
