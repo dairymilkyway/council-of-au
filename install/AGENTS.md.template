@@ -1,0 +1,102 @@
+# AGENTS.md - [Your Project Name]
+
+Top-level operating manual for AI coding agents working on this project.
+Read this first. Every section below tells the agents what they need to know
+to work in this codebase without inventing architecture.
+
+---
+
+## Repository Layout
+
+```
+[project-root]/
++-- backend/        [Your backend framework - e.g. NestJS, Express, FastAPI]
++-- frontend/       [Your frontend framework - e.g. React, Vue, Next.js]
++-- [other dirs]
+```
+
+---
+
+## Per-Codebase Manuals
+
+- **Backend:** `backend/AGENTS.md` - architecture, DB conventions, DTO rules, auth pattern, test commands
+- **Frontend:** `frontend/AGENTS.md` - React/component conventions, data flow pattern, routing, shared components
+
+---
+
+## Stack Summary
+
+| Layer | Technology |
+|---|---|
+| Backend API | [e.g. NestJS 10, Prisma 6, PostgreSQL] |
+| Frontend SPA | [e.g. React 18, TypeScript, Vite, Tailwind CSS] |
+| Auth tokens | [e.g. sessionStorage key 'auth-token'] |
+| Toast library | [e.g. sonner - already mounted in App.tsx] |
+
+---
+
+## API Contract
+
+- Base URL: `/api/v1/`
+- Auth: [e.g. Bearer JWT in Authorization header]
+- List responses: [e.g. `{ data: T[], total, page, limit }`]
+
+---
+
+## Dev Server URLs
+
+- Frontend: [e.g. http://localhost:5173]
+- Backend: [e.g. http://localhost:3000]
+
+---
+
+## Auth Credentials (for andrei / QA testing)
+
+- Admin: [e.g. admin@example.com / password123]
+- Regular user: [e.g. user@example.com / password123]
+- Token storage: [e.g. sessionStorage.setItem('auth-token', token)]
+
+---
+
+## Key Cross-Cutting Rules
+
+1. [e.g. No repository classes in the backend. Services call the ORM directly.]
+2. [e.g. No global state library in the frontend. State lives in ViewModel hooks.]
+3. [e.g. No cross-feature imports. Features import from shared/ only.]
+4. [e.g. All routes live in frontend/src/app/App.tsx.]
+5. [e.g. Permission constants must stay in sync between backend and frontend.]
+6. **`tsc --noEmit` must pass before any change is considered complete.**
+7. **Never use PowerShell to write or modify any project file.** Use the write tool (fs_write) or str_replace. Use shell only for running commands.
+
+---
+
+## Test Commands
+
+```bash
+# Backend
+cd backend && npm run test:unit
+cd backend && npm run test:e2e
+
+# Frontend
+cd frontend && npx vitest run
+
+# TypeScript check
+cd backend && npx tsc --noEmit
+cd frontend && npx tsc --noEmit --project tsconfig.app.json
+```
+
+---
+
+## Agent Tooling
+
+- **Memory MCP:** Persistent knowledge graph at `.kiro/memory.jsonl`.
+- **PostgreSQL MCP:** Use when the task involves schema, migrations, or SQL query verification.
+- **Playwright MCP:** Use for frontend bug verification. Dev server must be running.
+
+---
+
+## Permission Constants
+
+- Backend: [e.g. `backend/src/common/constants/permissions.constants.ts`]
+- Frontend: [e.g. `frontend/src/shared/config/permissions.ts`]
+- These files must stay in sync. Update both when adding a new permission code.
