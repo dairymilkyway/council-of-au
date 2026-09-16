@@ -49,21 +49,21 @@ This means the same agent configs work on any project that has a well-written `A
 
 ### Step 1 - Update the hook path for your machine
 
-Every agent JSON references hooks using an absolute path hardcoded to the original machine:
+The agent JSON files contain a placeholder path that must be replaced with your
+actual global hooks directory before installing:
 
 ```
-C:\Users\Gwyn\.kiro\hooks\session-init.ps1
+__KIRO_HOOKS_PATH__
 ```
 
-Before copying the agents, find-and-replace that path with your own username:
+Run the appropriate command from inside the cloned repo directory:
 
 **Windows (PowerShell):**
 ```powershell
 $myHookPath = "$env:USERPROFILE\.kiro\hooks"
-Get-ChildItem "council-of-au\agents\*.json" | ForEach-Object {
+Get-ChildItem "agents\*.json" | ForEach-Object {
   (Get-Content $_.FullName -Raw) `
-    -replace [regex]::Escape('C:\\Users\\Gwyn\\.kiro\\hooks\\'), `
-             ($myHookPath.Replace('\','\\') + '\\') `
+    -replace '__KIRO_HOOKS_PATH__\\', ($myHookPath.Replace('\','\\') + '\\') `
   | Set-Content $_.FullName -NoNewline
 }
 ```
@@ -71,8 +71,8 @@ Get-ChildItem "council-of-au\agents\*.json" | ForEach-Object {
 **Mac/Linux (bash):**
 ```bash
 HOOK_PATH="$HOME/.kiro/hooks"
-for f in council-of-au/agents/*.json; do
-  sed -i "s|/Users/Gwyn/.kiro/hooks/|$HOOK_PATH/|g" "$f"
+for f in agents/*.json; do
+  sed -i "s|__KIRO_HOOKS_PATH__/|$HOOK_PATH/|g" "$f"
 done
 ```
 
@@ -97,17 +97,36 @@ Copy-Item "council-of-au\hooks\*" "$env:USERPROFILE\.kiro\hooks\" -Force
 
 For each project that uses the council, add a `.kiro/mcp.json`:
 
+**Windows:**
 ```json
 {
   "mcpServers": {
     "memory": {
       "command": "powershell",
-      "args": ["-NoProfile", "-File", "C:\\Users\\YOU\\.kiro\\hooks\\mcp-memory.ps1"],
-      "env": { "MEMORY_FILE_PATH": "C:\\path\\to\\your\\project\\.kiro\\memory.jsonl" }
+      "args": ["-NoProfile", "-File", "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-memory.ps1"],
+      "env": { "MEMORY_FILE_PATH": "C:\\path\\to\\project\\.kiro\\memory.jsonl" }
     },
     "postgres": {
       "command": "powershell",
-      "args": ["-NoProfile", "-File", "C:\\Users\\YOU\\.kiro\\hooks\\mcp-postgres.ps1",
+      "args": ["-NoProfile", "-File", "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-postgres.ps1",
+               "postgresql://user:pass@localhost:5432/your_db"]
+    }
+  }
+}
+```
+
+**Mac/Linux:**
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "bash",
+      "args": ["/home/<YOUR_USERNAME>/.kiro/hooks/mcp-memory.sh"],
+      "env": { "MEMORY_FILE_PATH": "/path/to/project/.kiro/memory.jsonl" }
+    },
+    "postgres": {
+      "command": "bash",
+      "args": ["/home/<YOUR_USERNAME>/.kiro/hooks/mcp-postgres.sh",
                "postgresql://user:pass@localhost:5432/your_db"]
     }
   }

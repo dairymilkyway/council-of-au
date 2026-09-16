@@ -47,53 +47,53 @@
     {
       "name": "agentSpawn-0",
       "trigger": "agentSpawn",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\session-init.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\session-init.ps1" },
       "timeout": 10
     },
     {
       "name": "preToolUse-0",
       "trigger": "preToolUse",
       "matcher": "shell",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\pre-shell.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\pre-shell.ps1" },
       "timeout": 5
     },
     {
       "name": "preToolUse-1",
       "trigger": "preToolUse",
       "matcher": "write",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\pre-write.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\pre-write.ps1" },
       "timeout": 5
     },
     {
       "name": "postToolUse-0",
       "trigger": "postToolUse",
       "matcher": "shell",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\post-shell.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\post-shell.ps1" },
       "timeout": 5
     },
     {
       "name": "postToolUse-1",
       "trigger": "postToolUse",
       "matcher": "write",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\post-write.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\post-write.ps1" },
       "timeout": 5
     },
     {
       "name": "stop-0",
       "trigger": "stop",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\agent-stop.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\agent-stop.ps1" },
       "timeout": 5
     },
     {
       "name": "userPromptSubmit-0",
       "trigger": "userPromptSubmit",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\prompt-submit.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\prompt-submit.ps1" },
       "timeout": 5
     },
     {
       "name": "agentError-0",
       "trigger": "agentError",
-      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File C:\\Users\\Gwyn\\.kiro\\hooks\\agent-error.ps1" },
+      "action": { "type": "command", "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\agent-error.ps1" },
       "timeout": 5
     }
   ]
