@@ -10,9 +10,15 @@ Storage: `.kiro/memory.jsonl` in the active workspace root.
 
 ## On every session start
 
-Before doing anything else, call `search_nodes` or `read_graph` to load
-relevant context about the project. This recovers what was learned in
-previous sessions that ended with `/clear` or a fresh window.
+Before doing anything else, call `search_nodes` with a topic keyword relevant
+to the current task. This is faster than `read_graph` and keeps context focused.
+
+Use `read_graph` only when:
+- You are disoriented (no task context, fresh session after `/clear`)
+- You need a full project map to decide where to start
+
+`read_graph` dumps all 40+ entities. On a focused task it floods context with
+irrelevant facts. Default to `search_nodes` first.
 
 ## What to save
 

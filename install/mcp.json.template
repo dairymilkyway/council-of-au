@@ -1,23 +1,21 @@
 {
   "mcpServers": {
     "memory": {
-      "command": "powershell",
+      "command": "npx",
       "args": [
-        "-NoProfile",
-        "-File",
-        "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-memory.ps1"
+        "-y",
+        "@modelcontextprotocol/server-memory"
       ],
       "env": {
-        "MEMORY_FILE_PATH": "C:\\path\\to\\your-project\\.kiro\\memory.jsonl"
+        "MEMORY_FILE_PATH": ".kiro/memory.jsonl"
       },
       "disabled": false
     },
     "postgres": {
-      "command": "powershell",
+      "command": "npx",
       "args": [
-        "-NoProfile",
-        "-File",
-        "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-postgres.ps1",
+        "-y",
+        "@modelcontextprotocol/server-postgres",
         "postgresql://user:password@localhost:5432/your_database"
       ],
       "disabled": false

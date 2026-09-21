@@ -5,3 +5,4 @@ hooks/.session-first-write
 # OS artifacts
 .DS_Store
 Thumbs.db
+tests

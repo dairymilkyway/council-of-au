@@ -7,7 +7,38 @@ $writeMarker = Join-Path $markerDir '.session-first-write'
 if (Test-Path $dbMarker)    { Remove-Item $dbMarker    -Force -ErrorAction SilentlyContinue }
 if (Test-Path $writeMarker) { Remove-Item $writeMarker -Force -ErrorAction SilentlyContinue }
 
-Write-Output @"
+# Detect which agent is spawning
+$agentName = ""
+if ($stdinData.agentName) { $agentName = $stdinData.agentName.ToLower() }
+
+# Specialists get a scoped init - no orchestration instructions
+$specialists = @('jigs', 'ogie', 'john', 'andrei', 'semantic_reviewer', 'adam')
+$isSpecialist = $specialists -contains $agentName
+
+if ($isSpecialist) {
+  Write-Output @"
+=== SESSION START ($agentName) ===
+
+STEP 1 - Call todo_list list to check for an existing task list from this session.
+
+STEP 2 - Call search_nodes on the memory MCP with a topic keyword relevant to
+  the task you were given. This restores facts from prior sessions about this
+  area of the codebase.
+  Use search_nodes, not read_graph. read_graph dumps all entities - too broad.
+
+SCOPE REMINDER: You are $agentName. Stay within your domain.
+  - jigs: frontend source tree only. No backend, no schema.
+  - ogie: backend source tree only. No frontend, no schema.
+  - john: schema, migrations, seed data only. No application source.
+  - andrei: verification only. No application code edits.
+  - semantic_reviewer: semantic-review/ directory only. No application code edits.
+  - adam: read-only. No file writes except the spec file.
+
+=== END SESSION START ===
+"@
+} else {
+  # dev (orchestrator) gets the full init
+  Write-Output @"
 === SESSION START - MANDATORY FIRST ACTIONS ===
 
 STEP 1 - CALL todo_list list RIGHT NOW (before anything else):
@@ -49,4 +80,5 @@ MEMORY-PRIME: For today's task, call search_nodes with a topic keyword
 
 === END SESSION START ===
 "@
+}
 exit 0

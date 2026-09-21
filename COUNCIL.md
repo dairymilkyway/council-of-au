@@ -99,6 +99,15 @@ When andrei returns Blocked, dev runs this loop autonomously:
 After 5 consecutive Blocked rounds on the same finding: dispatch adam to
 re-investigate the root cause. The fix strategy was wrong, not just the code.
 
+**semantic_reviewer and the fix loop:**
+semantic_reviewer runs ONCE - after all implementation agents finish, before the first andrei dispatch.
+On fix-loop iterations 2+, dispatch directly to andrei. Do NOT re-run semantic_reviewer on each fix.
+
+**semantic_reviewer Blocked path (before andrei ever runs):**
+If semantic_reviewer returns Blocked or Needs Changes, route findings to the responsible agent
+using the surgical dispatch template. After the fix, re-run semantic_reviewer. Only dispatch andrei
+once semantic_reviewer returns Ready. This is separate from the andrei fix loop.
+
 The surgical dispatch template (required - prevents overengineering):
 ```
 FIX-LOOP DISPATCH - SURGICAL SCOPE ONLY

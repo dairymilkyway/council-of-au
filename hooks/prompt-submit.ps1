@@ -293,5 +293,60 @@ if ($isAndreiTask -and -not $isQaAudit -and -not $isRubberDuckTask) {
   $output += "SEMANTIC-REVIEWER-GATE: Before dispatching andrei, confirm semantic_reviewer has already run on the diff this session. If not, dispatch semantic_reviewer FIRST, then andrei. semantic_reviewer catches logic/security/architecture issues that andrei's runtime tests cannot.`n"
 }
 
+# Post-council correction detection
+# Fires when: spec files exist in the council specs dir (council ran previously)
+# AND the prompt sounds like a correction/complaint rather than a new council trigger
+$councilSpecsDir = ""
+$councilConfigPath = Join-Path $env:USERPROFILE ".kiro\council.config.json"
+if (Test-Path $councilConfigPath) {
+  try {
+    $councilConfig = Get-Content $councilConfigPath -Raw | ConvertFrom-Json
+    $councilSpecsDir = $councilConfig.outputDirs.specs
+  } catch { }
+}
+
+$hasSpecFiles = $false
+if ($councilSpecsDir -and (Test-Path $councilSpecsDir)) {
+  $specFiles = Get-ChildItem $councilSpecsDir -Filter "*.md" -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -ne ".gitkeep" }
+  $hasSpecFiles = $specFiles -and $specFiles.Count -gt 0
+}
+
+$postCouncilCorrectionPatterns = @(
+  '\bstill\s+(broken|wrong|not\s+working|failing|off)\b',
+  '\b(its|it.s|the)\s+(still|not|wrong|broken)\b',
+  '\b(button|form|modal|table|page|screen|field|input|dropdown|error|data|endpoint|api|response)\s+(is\s+)?(wrong|broken|missing|not|still|off)\b',
+  '\bnot\s+(saving|loading|showing|working|displaying|updating|returning|appearing)\b',
+  '\bshould\s+(be|show|display|return|save|load|work)\b',
+  '\bsupposed\s+to\b',
+  '\b(something|this|that)\s+is\s+(still\s+)?(wrong|off|broken|not\s+right)\b',
+  '\b(fix|change|update|correct)\s+(this|the|it|that)\b',
+  '\bwhy\s+(is|does|isn.t|doesn.t)\b',
+  '\bnot\s+right\b'
+)
+
+$isPostCouncilCorrection = $false
+if (-not $isCouncilTask) {
+  foreach ($pcp in $postCouncilCorrectionPatterns) {
+    if ($prompt -match $pcp) { $isPostCouncilCorrection = $true; break }
+  }
+}
+
+if ($isPostCouncilCorrection -and $hasSpecFiles) {
+  $output += @"
+POST-COUNCIL-LOCK: A council has previously run (spec files detected in council tests/specs/). The trivial exception is SUSPENDED.
+
+Do NOT self-fix. Do NOT write a single line of application code.
+
+Classify the finding and dispatch the right specialist:
+  - Frontend (UI, button, form, style, React) -> dispatch jigs
+  - Backend (API, data, endpoint, service)    -> dispatch ogie
+  - Database (schema, migration, seed)        -> dispatch john
+  - Cause unclear                             -> dispatch adam first
+
+Use the SURGICAL DISPATCH TEMPLATE from Rule 5a. After the specialist fixes it, re-dispatch andrei.
+"@
+}
+
 Write-Output $output
 exit 0

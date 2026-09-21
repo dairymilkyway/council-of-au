@@ -65,8 +65,8 @@ $shellWritePatterns = @(
   '>\s+.*\.(ts|tsx|js|jsx|prisma)\b'
 )
 
-foreach (\$swp in \$shellWritePatterns) {
-  if (\$cmdLower -match \$swp) {
+foreach ($swp in $shellWritePatterns) {
+  if ($cmdLower -match $swp) {
     Write-Output "SHELL-WRITE-BLOCKED: Writing source files via shell bypasses pre-write ban rules. Use the write tool for source file writes."
     exit 1
   }

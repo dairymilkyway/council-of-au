@@ -376,12 +376,14 @@ Load `feature-intake` when the task specifically concerns:
 
 Skills are installed in `.kiro/skills/` in this workspace:
 
-- `i-have-adhd` ← always-on
+- `i-have-adhd` <- always-on
 - `react-typescript`
 - `vercel-react-best-practices`
 - `frontend-ui-engineering`
 - `building-components`
-- `frontend-design`\n- `impeccable`\n- `better-ui`
+- `frontend-design`
+- `impeccable`
+- `better-ui`
 - `better-typography`
 - `rubber-duck`
 - `review-plan`
@@ -497,12 +499,14 @@ Load via: `disclose_context('council-plan')`
 
 Skills are installed in `.kiro/skills/` in this workspace:
 
-- `i-have-adhd` ← always-on
+- `i-have-adhd` <- always-on
 - `react-typescript`
 - `vercel-react-best-practices`
 - `frontend-ui-engineering`
 - `building-components`
-- `frontend-design`\n- `impeccable`\n- `better-ui`
+- `frontend-design`
+- `impeccable`
+- `better-ui`
 - `better-typography`
 - `rubber-duck`
 - `review-plan`

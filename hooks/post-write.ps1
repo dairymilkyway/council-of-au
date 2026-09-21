@@ -22,6 +22,7 @@ $isMemoryWorthy = $path -match '(
   schema\.prisma$|
   memory\.jsonl$|
   tests[/\\]specs[/\\].*\.md$|
+  semantic-review[/\\].*\.md$|
   [/\\]shared[/\\]components[/\\]|
   [/\\]shared[/\\]models[/\\]|
   [/\\]shared[/\\]config[/\\]permissions

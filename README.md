@@ -47,43 +47,25 @@ This means the same agent configs work on any project that has a well-written `A
 
 ## Installation
 
-### Step 1 - Update the hook path for your machine
+### Step 1 - Run the install script (replaces hook paths + writes config)
 
-The agent JSON files contain a placeholder path that must be replaced with your
-actual global hooks directory before installing:
+Run from inside the cloned repo directory:
 
+```bash
+node install/replace-hook-path.js
 ```
-__KIRO_HOOKS_PATH__
-```
 
-Run the appropriate command from inside the cloned repo directory:
+This does two things:
+1. Replaces `__KIRO_HOOKS_PATH__` in all agent JSON files with your actual `~/.kiro/hooks` path.
+2. Writes `~/.kiro/council.config.json` with the council repo root path - this is how agents know where to write specs, screenshots, and review reports at runtime.
+
+### Step 2 - Copy hooks, steering, and skills to global
+
+Agents are already copied by Step 1. Copy the rest:
 
 **Windows (PowerShell):**
 ```powershell
-$myHookPath = "$env:USERPROFILE\.kiro\hooks"
-Get-ChildItem "agents\*.json" | ForEach-Object {
-  (Get-Content $_.FullName -Raw) `
-    -replace '__KIRO_HOOKS_PATH__\\', ($myHookPath.Replace('\','\\') + '\\') `
-  | Set-Content $_.FullName -NoNewline
-}
-```
-
-**Mac/Linux (bash):**
-```bash
-HOOK_PATH="$HOME/.kiro/hooks"
-for f in agents/*.json; do
-  sed -i "s|__KIRO_HOOKS_PATH__/|$HOOK_PATH/|g" "$f"
-done
-```
-
-### Step 2 - Copy everything to global
-
-**Windows (PowerShell) - run from inside the cloned repo directory:**
-```powershell
-# Agents
-Copy-Item "agents\*.json" "$env:USERPROFILE\.kiro\agents\" -Force
-
-# Skills (use robocopy to handle nested directories)
+# Skills
 robocopy "skills" "$env:USERPROFILE\.kiro\skills" /E /NP /NFL /NDL /NJH /NJS
 
 # Steering
@@ -95,53 +77,42 @@ New-Item -Path "$env:USERPROFILE\.kiro\hooks" -ItemType Directory -Force | Out-N
 Copy-Item "hooks\*" "$env:USERPROFILE\.kiro\hooks\" -Force
 ```
 
-**Mac/Linux (bash):**
+**Mac/Linux:**
 ```bash
-cp agents/*.json ~/.kiro/agents/
 cp -r skills/* ~/.kiro/skills/
 cp steering/* ~/.kiro/steering/
 cp hooks/* ~/.kiro/hooks/
 ```
 
+> Note: Do NOT manually copy `agents/*.json` - Step 1 already copies them with hooks patched. Copying agents manually brings back the `__KIRO_HOOKS_PATH__` placeholder and breaks all hooks.
+
 ### Step 3 - Set up each project
 
-For each project that uses the council, add a `.kiro/mcp.json`:
+For each project that uses the council, add a `.kiro/mcp.json`.
+Use a relative path for `MEMORY_FILE_PATH` so it works on any machine:
 
-**Windows:**
 ```json
 {
   "mcpServers": {
     "memory": {
-      "command": "powershell",
-      "args": ["-NoProfile", "-File", "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-memory.ps1"],
-      "env": { "MEMORY_FILE_PATH": "C:\\path\\to\\project\\.kiro\\memory.jsonl" }
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": { "MEMORY_FILE_PATH": ".kiro/memory.jsonl" },
+      "disabled": false
     },
     "postgres": {
-      "command": "powershell",
-      "args": ["-NoProfile", "-File", "C:\\Users\\<YOUR_USERNAME>\\.kiro\\hooks\\mcp-postgres.ps1",
-               "postgresql://user:pass@localhost:5432/your_db"]
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres",
+               "postgresql://user:pass@localhost:5432/your_db"],
+      "disabled": false
     }
   }
 }
 ```
 
-**Mac/Linux:**
-```json
-{
-  "mcpServers": {
-    "memory": {
-      "command": "bash",
-      "args": ["/home/<YOUR_USERNAME>/.kiro/hooks/mcp-memory.sh"],
-      "env": { "MEMORY_FILE_PATH": "/path/to/project/.kiro/memory.jsonl" }
-    },
-    "postgres": {
-      "command": "bash",
-      "args": ["/home/<YOUR_USERNAME>/.kiro/hooks/mcp-postgres.sh",
-               "postgresql://user:pass@localhost:5432/your_db"]
-    }
-  }
-}
-```
+Do NOT use a hardcoded absolute path for `MEMORY_FILE_PATH`. An absolute path
+that works on your machine silently writes to the wrong location on anyone else's.
+The relative path `.kiro/memory.jsonl` resolves against the workspace root.
 
 Then write `AGENTS.md` at your project root. See `install/AGENTS.md.template` for required sections.
 

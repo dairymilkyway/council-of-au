@@ -28,5 +28,18 @@ if (Test-Path $memoryFile) {
   }
 }
 
+# Semantic-review unread report check
+$srDir = Join-Path $stdinData.cwd 'semantic-review'
+if (Test-Path $srDir) {
+  $recentReports = Get-ChildItem $srDir -Filter '*.md' -ErrorAction SilentlyContinue |
+    Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } |
+    Select-Object -ExpandProperty Name
+  if ($recentReports) {
+    $reportList = $recentReports -join ', '
+    $output += "SEMANTIC-REVIEW-UNREAD: Recent review report(s) found in semantic-review/: $reportList. If dev has not yet acted on these findings, read them before ending this session. Unread Blocked findings will be lost.
+"
+  }
+}
+
 Write-Output $output
 exit 0
