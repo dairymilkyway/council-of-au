@@ -2,7 +2,10 @@ $stdinData = [Console]::In.ReadToEnd() | ConvertFrom-Json
 $path = ""
 if ($stdinData.tool_input.path) { $path = $stdinData.tool_input.path }
 
-$markerDir  = Join-Path $stdinData.cwd '.kiro/hooks'
+# Compute a per-project temp dir so markers never land inside the project workspace
+$cwdBytes  = [System.Text.Encoding]::UTF8.GetBytes($stdinData.cwd)
+$cwdHash   = ([System.Security.Cryptography.MD5]::Create().ComputeHash($cwdBytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+$markerDir = Join-Path $env:TEMP "kiro-markers\$cwdHash"
 $firstWrite = Join-Path $markerDir '.session-first-write'
 $output     = ""
 
@@ -10,6 +13,7 @@ $output     = ""
 # Only fires once per session.
 # Exception: writing to tests/specs/ is the plan deliverable itself.
 if (-not (Test-Path $firstWrite)) {
+  New-Item -Path $markerDir -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
   New-Item -Path $firstWrite -ItemType File -Force -ErrorAction SilentlyContinue | Out-Null
   if ($path -notmatch 'tests[/\\]specs[/\\].*\.md$' -and $path -notmatch '(^|[/\\])semantic-review[/\\]') {
     $output += @"

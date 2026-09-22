@@ -1,0 +1,207 @@
+# frontend/AGENTS.md - [Your Project Name] Frontend
+
+Operating manual for AI agents working on frontend code.
+Read this **before** writing any component, hook, page, or style.
+
+---
+
+## Frontend Tech Stack
+
+| Item | Value |
+|---|---|
+| Framework | [e.g. React 18 + TypeScript] |
+| Build tool | [e.g. Vite] |
+| Styling | [e.g. Tailwind CSS v3] |
+| Component library | [e.g. @myproject/ui - see Shared Components below] |
+| State management | [e.g. No global store. State lives in ViewModel hooks.] |
+| Routing | [e.g. React Router v6] |
+| Data fetching | [e.g. Custom hooks wrapping fetch with the API client] |
+| Form library | [e.g. None - controlled inputs only] |
+| Toast/notification | [e.g. sonner - already mounted in App.tsx, import toast from sonner] |
+
+---
+
+## Directory Layout
+
+```
+frontend/src/
++-- app/
+|   +-- App.tsx         Route registry - ALL routes declared here
+|   +-- routes/         Lazy-loaded route components
++-- features/           One directory per domain feature
+|   +-- [feature]/
+|       +-- pages/      Page components (route-level)
+|       +-- components/ Feature-local components
+|       +-- hooks/      Feature-local ViewModel hooks
+|       +-- types.ts    Feature-local TypeScript types
++-- shared/             Cross-feature shared code - import from here, not from other features
+|   +-- components/     Shared UI components (see registry below)
+|   +-- hooks/          Shared utility hooks
+|   +-- api/            API client and endpoint helpers
+|   +-- config/         Constants, permissions, feature flags
+|   +-- types/          Shared TypeScript types
++-- lib/                Third-party library wrappers
+```
+
+---
+
+## TypeScript Check
+
+```bash
+# Run from frontend/ directory (or project root)
+[e.g. npx tsc --noEmit --project tsconfig.app.json]
+[e.g. npx tsc --noEmit]
+```
+
+Zero errors required before reporting done.
+
+---
+
+## Dev Server
+
+```bash
+[e.g. cd frontend && npm run dev]
+```
+
+URL: `[e.g. http://localhost:5173]`
+
+---
+
+## Auth Token
+
+andrei uses these to authenticate before Playwright verification:
+
+- Login endpoint: `[e.g. POST http://localhost:3000/api/v1/auth/login]`
+- Login body: `[e.g. { "email": "admin@example.com", "password": "password123" }]`
+- Token field in response: `[e.g. response.data.accessToken]`
+- Token storage: `[e.g. sessionStorage.setItem('auth-token', token)]`
+- Admin credentials: `[e.g. admin@example.com / password123]`
+- Regular user: `[e.g. user@example.com / password123]`
+
+---
+
+## Route Registration
+
+All routes are declared in one file. **Do not add routes anywhere else.**
+
+```
+Route file: [e.g. frontend/src/app/App.tsx]
+Pattern: [e.g. <Route path="/feature/:id" element={<FeaturePage />} />]
+Lazy loading: [e.g. const FeaturePage = lazy(() => import('../features/feature/pages/FeaturePage'))]
+```
+
+---
+
+## Data Flow Pattern
+
+**Read this before writing any component that fetches or mutates data.**
+
+```
+[e.g. ViewModel pattern:
+  - Page component calls useFeatureViewModel() hook
+  - Hook owns all state, loading flags, error state
+  - Hook returns { data, isLoading, error, actions }
+  - Components receive props from the ViewModel, never fetch directly
+  - No direct API calls from components]
+
+[OR]
+
+[e.g. React Query pattern:
+  - Use useQuery for reads, useMutation for writes
+  - Query keys: [featureName, params] tuple
+  - API functions live in shared/api/<feature>.api.ts
+  - Components use the query hooks - never call fetch directly]
+```
+
+---
+
+## Shared Component Registry
+
+**Check this list before building a new component.** These are already built and maintained.
+Do NOT recreate them. Do NOT import from external UI libraries when a shared component exists.
+
+| Component | Import path | Key props |
+|---|---|---|
+| [e.g. Button] | [e.g. shared/components/Button] | [e.g. variant: 'primary' \| 'secondary' \| 'danger', isLoading, disabled] |
+| [e.g. Modal] | [e.g. shared/components/Modal] | [e.g. isOpen, onClose, title, children] |
+| [e.g. DataTable] | [e.g. shared/components/DataTable] | [e.g. columns, data, isLoading, pagination] |
+| [e.g. FormInput] | [e.g. shared/components/FormInput] | [e.g. label, name, error, register (react-hook-form)] |
+| [e.g. Badge] | [e.g. shared/components/Badge] | [e.g. tone: 'success' \| 'warning' \| 'error' \| 'neutral'] |
+| [e.g. ConfirmDialog] | [e.g. shared/components/ConfirmDialog] | [e.g. isOpen, onConfirm, onCancel, message, isLoading] |
+
+---
+
+## Component Library (external package)
+
+```
+[e.g. NOT USED - all components are in shared/components/]
+[OR]
+[e.g. Package: @myproject/ui]
+[e.g. Import: import { Button, Modal } from '@myproject/ui']
+[e.g. Docs: See the component storybook or package/README.md]
+[e.g. Known API quirks:]
+[   - Button uses 'variant' not 'type']
+[   - Modal requires 'isOpen' boolean, not 'open']
+[   - OtpInput value is string[], not string]
+```
+
+---
+
+## Permission Constants
+
+```
+File: [e.g. frontend/src/shared/config/permissions.ts]
+Pattern: [e.g. export const PERMISSIONS = { VIEW_EMPLOYEES: 'VIEW_EMPLOYEES', ... }]
+Usage: [e.g. import { PERMISSIONS } from 'shared/config/permissions'; then pass to usePermission(PERMISSIONS.X)]
+```
+
+**Must stay in sync with `backend/src/common/constants/permissions.constants.ts`.**
+When adding a new permission, update both files in the same commit.
+
+---
+
+## API Client
+
+```
+[e.g. Use the shared API client from shared/api/client.ts]
+[e.g. import { apiClient } from 'shared/api/client']
+[e.g. All requests automatically attach the auth token from sessionStorage]
+[e.g. Error responses throw ApiError with .status and .message fields]
+```
+
+Base URL: `[e.g. configured via VITE_API_URL env var, default /api/v1]`
+
+---
+
+## Styling Conventions
+
+```
+[e.g. Tailwind CSS only - no inline styles, no CSS modules, no styled-components]
+[e.g. Use the project's design token classes: text-primary, bg-surface, border-default, etc.]
+[e.g. Responsive: mobile-first with sm:, md:, lg: breakpoints]
+[e.g. Dark mode: use dark: prefix if the project supports it]
+```
+
+---
+
+## Accessibility Baseline (non-negotiable)
+
+- All interactive elements have accessible labels (`aria-label` or visible text)
+- Focus management: modals trap focus, drawer/dialog returns focus on close
+- Keyboard navigation: all interactive elements reachable and operable via keyboard
+- Form inputs have associated labels (`<label htmlFor>` or `aria-labelledby`)
+- Error messages linked to inputs via `aria-describedby`
+- Loading states announce to screen readers (`aria-live` or `role="status"`)
+
+---
+
+## Known Patterns to Follow (project-specific)
+
+```
+[Add any additional patterns specific to THIS project that agents must follow]
+[e.g. All list pages use the DataTable component with server-side pagination]
+[e.g. Error boundaries are mounted at the feature level, not per-component]
+[e.g. Toast for success messages: toast.success('...') - import from sonner]
+[e.g. Toast for errors: toast.error('...') - always use human-readable messages]
+[e.g. All date displays use the formatDate util from shared/utils/date.ts]
+```

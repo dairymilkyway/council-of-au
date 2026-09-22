@@ -19,6 +19,9 @@ const globalAgentsDir = path.join(os.homedir(), '.kiro', 'agents');
 
 const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.json'));
 
+// Ensure the global agents directory exists - fresh Kiro installs won't have it yet
+fs.mkdirSync(globalAgentsDir, { recursive: true });
+
 console.log('Hook path: ' + hookPath);
 console.log('Patching ' + files.length + ' agent files...\n');
 
@@ -50,19 +53,15 @@ for (const file of files) {
   }
 
   // Write patched version to global with JSON.stringify (handles backslash escaping correctly)
-  if (fs.existsSync(globalAgentsDir)) {
-    const globalFile = path.join(globalAgentsDir, file);
-    fs.writeFileSync(globalFile, JSON.stringify(j, null, 2), 'utf8');
+  const globalFile = path.join(globalAgentsDir, file);
+  fs.writeFileSync(globalFile, JSON.stringify(j, null, 2), 'utf8');
 
-    // Validate
-    try {
-      JSON.parse(fs.readFileSync(globalFile, 'utf8'));
-      console.log('  ' + file + ': patched and copied to global OK');
-    } catch (e) {
-      console.error('  ' + file + ': global file invalid after write - ' + e.message.substring(0, 60));
-    }
-  } else {
-    console.log('  ' + file + ': global dir not found, skipping copy');
+  // Validate
+  try {
+    JSON.parse(fs.readFileSync(globalFile, 'utf8'));
+    console.log('  ' + file + ': patched and copied to global OK');
+  } catch (e) {
+    console.error('  ' + file + ': global file invalid after write - ' + e.message.substring(0, 60));
   }
 }
 

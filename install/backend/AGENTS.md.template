@@ -1,0 +1,244 @@
+# backend/AGENTS.md - [Your Project Name] Backend
+
+Operating manual for AI agents working on backend code.
+Read this **before** writing any endpoint, service, migration, or query.
+
+---
+
+## Backend Tech Stack
+
+| Item | Value |
+|---|---|
+| Framework | [e.g. NestJS 10] |
+| ORM | [e.g. Prisma 6] |
+| Database | [e.g. PostgreSQL 16] |
+| Auth strategy | [e.g. JWT Bearer, passport-jwt] |
+| Validation | [e.g. class-validator + class-transformer, global ValidationPipe] |
+| Test runner | [e.g. Jest] |
+
+---
+
+## Directory Layout
+
+```
+backend/src/
++-- app.module.ts
++-- main.ts
++-- common/             Shared utilities - read this before writing anything new
+|   +-- guards/         Auth guards
+|   +-- decorators/     Custom decorators (e.g. @CurrentUser, @Roles)
+|   +-- pipes/          Custom pipes
+|   +-- interceptors/
+|   +-- helpers/        Shared service helpers - LIST THEM BELOW
++-- modules/
+    +-- [feature]/      One directory per domain feature
+        +-- [feature].module.ts
+        +-- [feature].controller.ts
+        +-- [feature].service.ts
+        +-- dto/
+        +-- entities/
+```
+
+---
+
+## TypeScript Check
+
+```bash
+# Run from backend/ directory
+[e.g. npx tsc --noEmit]
+[e.g. npx tsc --noEmit --project tsconfig.json]
+```
+
+Zero errors required before reporting done.
+
+---
+
+## Test Commands
+
+```bash
+# Unit tests
+[e.g. cd backend && npm run test:unit]
+[e.g. cd backend && npm run test:unit -- --testPathPattern=<file>]
+
+# E2E tests
+[e.g. cd backend && npm run test:e2e]
+
+# All tests
+[e.g. cd backend && npm run test:all]
+```
+
+---
+
+## Shared Service Helpers
+
+**READ THESE BEFORE WRITING ANY SERVICE METHOD. Using them is not optional.**
+
+Ogie and john must check this section before writing any list, paginate, read, write, or audit operation.
+Do not reinvent these - reinventing them will be Blocked by semantic_reviewer.
+
+### Pagination / List helpers
+```
+[e.g. common/helpers/paginate.helper.ts]
+[e.g. Usage: paginateQuery(prisma.model, { page, limit, where, orderBy })]
+```
+
+### Read helpers (single record, type-safe)
+```
+[e.g. common/helpers/find-one-or-fail.helper.ts]
+[e.g. Usage: findOneOrFail(prisma.model, { id })]
+```
+
+### Write guard helpers (check before mutating)
+```
+[e.g. common/helpers/ownership.helper.ts]
+[e.g. Usage: assertOwnership(record, requestingUserId)]
+```
+
+### Time-sliced / effective-dated helpers
+```
+[e.g. NOT USED in this project]
+[OR]
+[e.g. common/helpers/effective-date.helper.ts]
+[e.g. Usage: getActiveRecord(prisma.model, { id, asOf: new Date() })]
+[e.g. Never write raw date range filters - use this helper.]
+```
+
+### Response projection / field masking
+```
+[e.g. NOT USED - services return full objects and controllers use class-transformer]
+[OR]
+[e.g. common/helpers/project-response.helper.ts]
+[e.g. Usage: projectResponse(record, SomeResponseDto)]
+```
+
+### Data scope / tenant isolation
+```
+[e.g. NOT USED - single-tenant app]
+[OR]
+[e.g. common/services/scope.service.ts]
+[e.g. Usage: inject ScopeService, call getScope(user) to get the WHERE clause filter]
+[e.g. Every query that touches user-owned data MUST apply the scope filter.]
+```
+
+---
+
+## Auth Pattern
+
+```
+[e.g. Use @UseGuards(JwtAuthGuard) on every non-public route]
+[e.g. Use @Public() decorator to explicitly mark public routes]
+[e.g. Get the current user from @CurrentUser() decorator in the controller]
+[e.g. JwtAuthGuard is applied globally in app.module.ts]
+```
+
+Auth guard location: `[e.g. backend/src/common/guards/jwt-auth.guard.ts]`
+Current user decorator: `[e.g. backend/src/common/decorators/current-user.decorator.ts]`
+
+---
+
+## Permission / RBAC Pattern
+
+```
+[e.g. Use @RequirePermission('PERMISSION_CODE') from common/decorators/require-permission.decorator.ts]
+[e.g. Permission codes are in backend/src/common/constants/permissions.constants.ts]
+[e.g. These must stay in sync with frontend/src/shared/config/permissions.ts]
+```
+
+Permission constants file: `[e.g. backend/src/common/constants/permissions.constants.ts]`
+
+---
+
+## Audit / Event Logging Pattern
+
+```
+[e.g. NOT USED in this project]
+[OR]
+[e.g. Inject AuditService. Call auditService.log(user, action, resourceType, resourceId) AFTER transaction commits.]
+[e.g. Audit writes happen outside the main transaction - not inside it.]
+[e.g. Required after: create, update, delete on all employee records.]
+```
+
+Audit service location: `[e.g. backend/src/common/services/audit.service.ts]`
+
+---
+
+## Transaction Pattern
+
+```
+[e.g. Use prisma.$transaction([...operations]) for atomic multi-step writes]
+[e.g. Use prisma.$transaction(async (tx) => { ... }) for complex transactions with control flow]
+[e.g. Pass the transaction client (tx) to all operations inside the callback]
+```
+
+---
+
+## DTO Conventions
+
+- Every request body: DTO class with `@IsString()`, `@IsEnum()`, etc. validators
+- Every query param: DTO with `@IsOptional()` where appropriate
+- Global `ValidationPipe` with `whitelist: true, forbidNonWhitelisted: true` is configured in `main.ts`
+- `@Transform()` for type coercion (query params arrive as strings)
+- Response DTOs: use `@Expose()` and `excludeExtraneousValues: true` to prevent data leaks
+
+---
+
+## Error Handling
+
+Use framework exceptions only. Never throw raw `Error`.
+
+| Situation | Exception |
+|---|---|
+| Record not found | `NotFoundException` |
+| Not authenticated | `UnauthorizedException` |
+| Wrong role/permission | `ForbiddenException` |
+| Bad input | `BadRequestException` |
+| Duplicate/conflict | `ConflictException` |
+
+---
+
+## Migration Tool
+
+```bash
+# Run from backend/ directory
+[e.g. npx prisma migrate dev --name <migration-name>]
+[e.g. npx prisma generate   (after schema changes)]
+[e.g. npx prisma db seed    (seed data)]
+```
+
+Schema file: `[e.g. backend/prisma/schema.prisma]`
+Migrations: `[e.g. backend/prisma/migrations/]`
+Seeder: `[e.g. backend/prisma/seed.ts]`
+
+---
+
+## Seeder Pattern
+
+```
+[e.g. Seeder uses upsert with stable IDs. Run: npx prisma db seed]
+[e.g. Seeder location: backend/prisma/seed.ts]
+[e.g. All seed data must be idempotent - safe to run multiple times]
+[e.g. Seed order: roles -> permissions -> role-permissions -> users -> ... (respect FK order)]
+```
+
+---
+
+## Security Baseline (non-negotiable per route)
+
+- [ ] Route has auth guard (or `@Public()` explicitly applied)
+- [ ] Permission check present if resource is role-gated
+- [ ] Ownership check present if resource belongs to a specific user
+- [ ] Request body validated through DTO
+- [ ] Response excludes sensitive fields (passwords, tokens, internal IDs)
+- [ ] Multi-step writes wrapped in transactions
+- [ ] List queries are paginated
+
+---
+
+## Known Patterns to Follow (project-specific)
+
+```
+[Add any additional patterns specific to THIS project that agents must follow]
+[e.g. All list endpoints return { data: T[], total: number, page: number, limit: number }]
+[e.g. Soft deletes: use isDeleted field + isDeleted: false filter - never hard-delete employee records]
+[e.g. All timestamps are stored as UTC]
+```

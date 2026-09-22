@@ -1,5 +1,10 @@
 $stdinData = [Console]::In.ReadToEnd() | ConvertFrom-Json
-$markerFile = Join-Path $stdinData.cwd '.kiro/hooks/.session-db-touch'
+
+# Compute a per-project temp dir so markers never land inside the project workspace
+$cwdBytes  = [System.Text.Encoding]::UTF8.GetBytes($stdinData.cwd)
+$cwdHash   = ([System.Security.Cryptography.MD5]::Create().ComputeHash($cwdBytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+$markerDir = Join-Path $env:TEMP "kiro-markers\$cwdHash"
+$markerFile = Join-Path $markerDir '.session-db-touch'
 
 $output = "VERIFY BEFORE DONE:`n- Ponytail: minimal diff, no unrelated changes`n- Build: npx tsc --noEmit passes`n"
 
@@ -29,7 +34,18 @@ if (Test-Path $memoryFile) {
 }
 
 # Semantic-review unread report check
-$srDir = Join-Path $stdinData.cwd 'semantic-review'
+# Use council.config.json to find the correct reviews directory (not the project cwd)
+$councilConfigPath = Join-Path $env:USERPROFILE '.kiro\council.config.json'
+$srDir = if (Test-Path $councilConfigPath) {
+  try {
+    $councilConfig = Get-Content $councilConfigPath -Raw | ConvertFrom-Json
+    $councilConfig.outputDirs.reviews
+  } catch {
+    Join-Path $stdinData.cwd 'semantic-review'
+  }
+} else {
+  Join-Path $stdinData.cwd 'semantic-review'
+}
 if (Test-Path $srDir) {
   $recentReports = Get-ChildItem $srDir -Filter '*.md' -ErrorAction SilentlyContinue |
     Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } |

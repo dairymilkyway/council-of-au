@@ -1,5 +1,9 @@
 $stdinData   = [Console]::In.ReadToEnd() | ConvertFrom-Json
-$markerDir   = Join-Path $stdinData.cwd '.kiro/hooks'
+
+# Compute a per-project temp dir so markers never land inside the project workspace
+$cwdBytes  = [System.Text.Encoding]::UTF8.GetBytes($stdinData.cwd)
+$cwdHash   = ([System.Security.Cryptography.MD5]::Create().ComputeHash($cwdBytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+$markerDir = Join-Path $env:TEMP "kiro-markers\$cwdHash"
 $dbMarker    = Join-Path $markerDir '.session-db-touch'
 $writeMarker = Join-Path $markerDir '.session-first-write'
 
@@ -47,9 +51,11 @@ STEP 1 - CALL todo_list list RIGHT NOW (before anything else):
   If the list is empty but you are mid-feature, recreate it immediately
   and complete the already-done tasks before continuing work.
 
-STEP 2 - CALL read_graph on the memory MCP to restore context.
-  This gives you: features in progress, architecture decisions, component API
-  facts, bug history, and what was built in prior sessions.
+STEP 2 - CALL search_nodes on the memory MCP with a topic keyword relevant to
+  the current task. This restores facts without flooding context with all 40+ entities.
+  Use read_graph ONLY when you are fully disoriented (fresh session, no task context,
+  after /clear) and search_nodes returns nothing useful.
+  Example: search_nodes("employee onboarding") not read_graph.
 
 AGENT-OWNERSHIP REMINDER:
   If resuming a council where a specialist (jigs/ogie/john/andrei/semantic_reviewer) was mid-task:
@@ -73,10 +79,6 @@ TODO-LIST RULES (prevent Task N not found errors):
       context_update: "Brief summary of what was done"
   - context_update is REQUIRED. Empty string = silent failure = task stays incomplete.
   - Task IDs are STRINGS: ["1"] not [1]
-
-MEMORY-PRIME: For today's task, call search_nodes with a topic keyword
-  instead of read_graph. read_graph dumps all entities - use it only when you are disoriented
-  or resuming from a session clear with no known task context.
 
 === END SESSION START ===
 "@

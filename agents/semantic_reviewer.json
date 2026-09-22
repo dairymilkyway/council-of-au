@@ -11,13 +11,9 @@
     "code",
     "glob",
     "grep",
-    "knowledge",
     "read",
     "shell",
     "todo_list",
-    "web",
-    "web_fetch",
-    "web_search",
     "write"
   ],
   "toolAliases": {},
@@ -168,16 +164,6 @@
       "action": {
         "type": "command",
         "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\agent-stop.ps1"
-      },
-      "timeout": 5
-    },
-    {
-      "name": "postToolUse-shell-0",
-      "trigger": "postToolUse",
-      "matcher": "shell",
-      "action": {
-        "type": "command",
-        "command": "powershell -NoProfile -WindowStyle Hidden -File __KIRO_HOOKS_PATH__\\post-shell.ps1"
       },
       "timeout": 5
     },

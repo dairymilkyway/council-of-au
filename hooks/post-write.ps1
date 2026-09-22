@@ -2,6 +2,11 @@ $stdinData = [Console]::In.ReadToEnd() | ConvertFrom-Json
 $path = ""
 if ($stdinData.tool_input.path) { $path = $stdinData.tool_input.path }
 
+# Compute a per-project temp dir so markers never land inside the project workspace
+$cwdBytes  = [System.Text.Encoding]::UTF8.GetBytes($stdinData.cwd)
+$cwdHash   = ([System.Security.Cryptography.MD5]::Create().ComputeHash($cwdBytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+$markerDir = Join-Path $env:TEMP "kiro-markers\$cwdHash"
+
 # -- PROJECT CONFIGURATION ----------------------------------------------------
 # Update these patterns when using this workflow on a new project.
 # Everything else in this file is portable as-is.
@@ -37,8 +42,8 @@ if ($isFrontendSource) {
 }
 
 if ($isBackend) {
-  $markerDir = Join-Path $stdinData.cwd '.kiro/hooks'
   $markerFile = Join-Path $markerDir '.session-db-touch'
+  New-Item -Path $markerDir -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
   Add-Content -Path $markerFile -Value $path -ErrorAction SilentlyContinue
   $output += "DB-FILE-MODIFIED: $path - Verify against PostgreSQL MCP: check schema consistency, migration safety, query correctness.`n"
 } else {

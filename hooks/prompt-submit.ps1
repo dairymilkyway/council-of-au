@@ -219,7 +219,6 @@ $promptMasterPatterns = @(
   '\bbetter\s+prompt\b',
   '\bprompt\s+for\s+(claude|cursor|midjourney|gpt|copilot|stable\s+diffusion|devin|bolt|v0)\b',
   '\badapt\s+(this\s+)?prompt\b',
-  '\bprompt\s+master\b',
   '/prompt-master'
 )
 

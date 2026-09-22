@@ -19,6 +19,14 @@
         "postgresql://user:password@localhost:5432/your_database"
       ],
       "disabled": false
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp"
+      ],
+      "disabled": false
     }
   }
 }

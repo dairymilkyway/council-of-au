@@ -372,6 +372,118 @@ Load `feature-intake` when the task specifically concerns:
 
 ---
 
+## Test-Driven Development Tasks
+
+If the task involves implementing features or fixing bugs with tests, load:
+
+1. `tdd`
+
+Load `tdd` when the task specifically concerns:
+
+- Writing tests before implementation ("write tests first", "TDD", "red-green-refactor")
+- Implementing any non-trivial service method or component that needs unit/integration tests
+- Any ogie or jigs implementation task (loaded automatically by those agents)
+- Reviewing whether existing tests are well-structured (seams, anti-patterns)
+
+**Do NOT load** `tdd` for:
+
+- Tasks that are purely about running tests (dispatch andrei instead)
+- Simple bug fixes where no new test is needed
+- QA verification passes (those belong to andrei)
+
+When `tdd` is active, always agree the seams under test with the user or spec before writing any test. If seam placement is unclear, load `codebase-design` first.
+
+---
+
+## Hard Bug Diagnosis Tasks
+
+If the bug is intermittent, the cause is unclear, or multiple speculative fixes have already failed, load:
+
+1. `diagnosing-bugs`
+
+Load `diagnosing-bugs` when:
+
+- The user says "diagnose this", "debug this", "I can't figure out why"
+- A bug has been reported and fixed before but keeps coming back
+- Multiple approaches have been tried without resolving the root cause
+- The bug is flaky / non-deterministic
+- Performance regression with unclear cause
+
+**Do NOT load** `diagnosing-bugs` for:
+
+- Simple obvious bugs with a clear fix (use the bug path directly)
+- Tasks where andrei is doing runtime verification (that is a QA pass, not a diagnosis)
+
+The `debug` skill is for lightweight inline debugging. `diagnosing-bugs` is for the 6-phase structured loop (build feedback loop -> reproduce + minimise -> hypothesise -> instrument -> fix -> cleanup). The key gate: no hypothesis until a tight, red-capable feedback loop exists.
+
+---
+
+## Domain Modeling Tasks
+
+If the task involves establishing or updating project terminology, load:
+
+1. `domain-modeling`
+
+Load `domain-modeling` when:
+
+- Creating or editing `CONTEXT.md` (project glossary)
+- Resolving conflicting terminology in the codebase
+- Writing or editing ADRs
+- Adam encounters undefined or conflicting domain terms during investigation
+- The user says "update the glossary", "add this to CONTEXT.md", "document this decision"
+
+**Do NOT load** `domain-modeling` for:
+
+- General implementation tasks (merely reading CONTEXT.md is not this skill)
+- Tasks where the domain vocabulary is already well-defined
+
+---
+
+## Module Interface Design Tasks
+
+If the task involves designing or restructuring a module's interface or deciding where seams belong, load:
+
+1. `codebase-design`
+
+Load `codebase-design` when:
+
+- Designing a new service, hook, or module interface
+- Deciding whether to split or merge modules
+- Making code more testable by restructuring interfaces
+- The `tdd` skill needs to identify the right test seam
+- Adam recommends a specific module shape and needs precise vocabulary
+
+**Do NOT load** `codebase-design` for:
+
+- Implementing an already-designed interface
+- Bug fixes that don't involve interface changes
+- Tasks where the module structure is already established
+
+---
+
+## UI Prototype Tasks
+
+If a UI design question needs exploring before committing to implementation, load:
+
+1. `prototype`
+
+Load `prototype` when:
+
+- The user says "prototype this", "explore the UI", "try a few directions"
+- A new interaction pattern has no precedent in the codebase
+- A complex state machine needs sanity-checking before implementation
+- Multiple UI directions are plausible and the user wants to pick one
+- jigs identifies a genuinely uncertain design decision in its own scope
+
+**Do NOT load** `prototype` for:
+
+- Standard CRUD screens or form additions
+- Tasks where the design direction is already established
+- Fix-loop dispatch tasks
+- Tasks where the spec already fully defines the UI behavior
+
+---
+
 ## Skill Locations
 
 Skills are installed in `.kiro/skills/` in this workspace:
@@ -395,6 +507,11 @@ Skills are installed in `.kiro/skills/` in this workspace:
 - `qa-audit`
 - `debug`
 - `prompt-master`
+- `tdd` <- from mattpocock/skills
+- `diagnosing-bugs` <- from mattpocock/skills
+- `domain-modeling` <- from mattpocock/skills
+- `codebase-design` <- from mattpocock/skills
+- `prototype` <- from mattpocock/skills
 
 ## QA Agent — Andrei
 
@@ -520,3 +637,8 @@ Skills are installed in `.kiro/skills/` in this workspace:
 - `qa-audit`
 - `debug`
 - `prompt-master`
+- `tdd` <- from mattpocock/skills
+- `diagnosing-bugs` <- from mattpocock/skills
+- `domain-modeling` <- from mattpocock/skills
+- `codebase-design` <- from mattpocock/skills
+- `prototype` <- from mattpocock/skills

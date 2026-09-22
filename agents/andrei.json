@@ -11,13 +11,10 @@
     "code",
     "glob",
     "grep",
-    "knowledge",
     "read",
     "shell",
     "todo_list",
-    "web",
     "web_fetch",
-    "web_search",
     "write"
   ],
   "toolAliases": {},

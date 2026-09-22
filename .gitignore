@@ -1,6 +1,6 @@
 # Kiro session markers (generated per workspace, not committed)
-hooks/.session-db-touch
-hooks/.session-first-write
+.kiro/hooks/.session-db-touch
+.kiro/hooks/.session-first-write
 
 # OS artifacts
 .DS_Store
